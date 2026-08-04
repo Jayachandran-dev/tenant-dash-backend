@@ -1,30 +1,49 @@
-const express = require('express');
-const prisma = require('../db');
-const authMiddleware = require('../middleware/auth');
+const express = require("express");
+const prisma = require("../db");
+const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
-router.get('/', authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const { tenantId } = req.user;
+    const { userId } = req.user;
+    const tenantId = parseInt(req.headers["x-tenant-id"]);
 
-    const tenant = await prisma.tenant.findUnique({
-      where: { id: tenantId },
+    if (!tenantId) {
+      return res.status(400).json({ message: "Tenant ID is required" });
+    }
+
+    // Verify user belongs to this tenant
+    const membership = await prisma.membership.findUnique({
+      where: {
+        userId_tenantId: {
+          userId,
+          tenantId,
+        },
+      },
+      include: {
+        tenant: true,
+      },
     });
+
+    if (!membership) {
+      return res.status(403).json({ message: "You do not have access to this tenant" });
+    }
 
     const items = await prisma.item.findMany({
       where: { tenantId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     res.json({
-      tenant,
+      tenant: membership.tenant,
+      role: membership.role,
       items,
-      message: `Welcome to ${tenant.name}`,
+      message: `Welcome to ${membership.tenant.name}`,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Dashboard error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
