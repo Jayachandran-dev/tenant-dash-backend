@@ -18,7 +18,9 @@ model Tenant {
 model User {
   id           Int          @id @default(autoincrement())
   mobile       String       @unique
-  passwordHash String?      // ← make it optional
+  name         String?
+  avatar       String?      // URL of profile image
+  passwordHash String?
   createdAt    DateTime     @default(now())
   memberships  Membership[]
 }
