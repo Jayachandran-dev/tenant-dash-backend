@@ -7,27 +7,40 @@ datasource db {
 }
 
 model Tenant {
-  id        Int      @id @default(autoincrement())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  users     User[]
-  items     Item[]
+  id          Int          @id @default(autoincrement())
+  name        String
+  slug        String       @unique
+  createdAt   DateTime     @default(now())
+  memberships Membership[]
+  items       Item[]
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  tenantId     Int
-  tenant       Tenant   @relation(fields: [tenantId], references: [id])
-  createdAt    DateTime @default(now())
+  id           Int          @id @default(autoincrement())
+  mobile       String       @unique
+  name         String?
+  avatar       String?      // URL of profile image
+  passwordHash String?
+  createdAt    DateTime     @default(now())
+  memberships  Membership[]
+}
+
+model Membership {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  tenantId  Int
+  role      String   @default("owner")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, tenantId])
 }
 
 model Item {
   id        Int      @id @default(autoincrement())
   title     String
   tenantId  Int
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }

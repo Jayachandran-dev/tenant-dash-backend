@@ -11,14 +11,31 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("Checking and seeding default tenants...");
+  console.log("Checking and seeding default data...");
 
-  const existingTenants = await prisma.tenant.count();
-
-  if (existingTenants > 0) {
-    console.log("Tenants already exist. Skipping seed.");
+  const existingUsers = await prisma.user.count();
+  if (existingUsers > 0) {
+    console.log("Data already exists. Skipping seed.");
     return;
   }
+
+  const hashedPassword = await bcrypt.hash("password123", 10);
+
+  // Create User 1
+  const user1 = await prisma.user.create({
+    data: {
+      mobile: "+919876543210",
+      passwordHash: hashedPassword,
+    },
+  });
+
+  // Create User 2
+  const user2 = await prisma.user.create({
+    data: {
+      mobile: "+919876543211",
+      passwordHash: hashedPassword,
+    },
+  });
 
   // Create Tenant 1 - Acme
   const acme = await prisma.tenant.create({
@@ -36,22 +53,20 @@ async function main() {
     },
   });
 
-  const hashedPassword = await bcrypt.hash("password123", 10);
-
-  // Users
-  await prisma.user.create({
+  // Memberships
+  await prisma.membership.create({
     data: {
-      email: "admin@acme.com",
-      passwordHash: hashedPassword,
+      userId: user1.id,
       tenantId: acme.id,
+      role: "owner",
     },
   });
 
-  await prisma.user.create({
+  await prisma.membership.create({
     data: {
-      email: "admin@globex.com",
-      passwordHash: hashedPassword,
+      userId: user2.id,
       tenantId: globex.id,
+      role: "owner",
     },
   });
 
@@ -65,10 +80,11 @@ async function main() {
     ],
   });
 
-  console.log("Default tenants and users created successfully!");
-  console.log("Login credentials:");
-  console.log("  Acme   → admin@acme.com / password123");
-  console.log("  Globex → admin@globex.com / password123");
+  console.log("Seed completed successfully!");
+  console.log("--------------------------------");
+  console.log("Test accounts:");
+  console.log("1. Mobile: +919876543210  | Password: password123  (Acme)");
+  console.log("2. Mobile: +919876543211  | Password: password123  (Globex)");
 }
 
 main()
