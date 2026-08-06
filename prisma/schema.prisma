@@ -7,12 +7,20 @@ datasource db {
 }
 
 model Tenant {
-  id          Int          @id @default(autoincrement())
-  name        String
-  slug        String       @unique
-  createdAt   DateTime     @default(now())
-  memberships Membership[]
-  items       Item[]
+  id           Int          @id @default(autoincrement())
+  name         String
+  slug         String       @unique
+  logo         String?
+  phone        String?
+  email        String?
+  tagline      String?
+  visitingCard String?
+  address      String?
+  website      String?
+  description  String?
+  createdAt    DateTime     @default(now())
+  memberships  Membership[]
+  items        Item[]
 }
 
 model User {
