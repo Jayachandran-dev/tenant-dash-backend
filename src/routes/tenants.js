@@ -54,6 +54,8 @@ router.post("/", authMiddleware, async (req, res) => {
       name: result.name,
       slug: result.slug,
       role: "owner",
+      themeColor: result.themeColor || "#0D9488",
+      themeMode: result.themeMode || "light",
     });
   } catch (error) {
     console.error("Create tenant error:", error);
@@ -79,6 +81,8 @@ router.get("/my", authMiddleware, async (req, res) => {
       name: m.tenant.name,
       slug: m.tenant.slug,
       role: m.role,
+      themeColor: m.tenant.themeColor || "#0D9488",
+      themeMode: m.tenant.themeMode || "light",
     }));
 
     res.json(tenants);
