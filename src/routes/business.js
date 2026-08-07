@@ -61,6 +61,8 @@ router.patch("/profile", authMiddleware, async (req, res) => {
       address,
       website,
       description,
+      themeColor,
+      themeMode,
     } = req.body;
 
     const updated = await prisma.tenant.update({
@@ -75,6 +77,8 @@ router.patch("/profile", authMiddleware, async (req, res) => {
         ...(address !== undefined && { address }),
         ...(website !== undefined && { website }),
         ...(description !== undefined && { description }),
+        ...(themeColor !== undefined && { themeColor }),
+        ...(themeMode !== undefined && { themeMode }),
       },
     });
 

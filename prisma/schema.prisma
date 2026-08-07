@@ -18,11 +18,12 @@ model Tenant {
   address      String?
   website      String?
   description  String?
+  themeColor   String?      @default("#0D9488")  
+  themeMode    String?      @default("light")    
   createdAt    DateTime     @default(now())
   memberships  Membership[]
   items        Item[]
 }
-
 model User {
   id           Int          @id @default(autoincrement())
   mobile       String       @unique
