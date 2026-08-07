@@ -78,6 +78,8 @@ router.post("/verify-otp", async (req, res) => {
       name: m.tenant.name,
       slug: m.tenant.slug,
       role: m.role,
+      themeColor: m.tenant.themeColor || "#0D9488",
+      themeMode: m.tenant.themeMode || "light",
     }));
 
     res.json({
@@ -164,6 +166,8 @@ router.post("/signup", async (req, res) => {
           name: result.tenant.name,
           slug: result.tenant.slug,
           role: "owner",
+          themeColor: m.tenant.themeColor || "#0D9488",
+          themeMode: m.tenant.themeMode || "light",
         },
       ],
     });
