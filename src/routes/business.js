@@ -82,6 +82,11 @@ router.patch("/profile", authMiddleware, async (req, res) => {
       },
     });
 
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`tenant:${tenantId}`).emit("business:updated", updated);
+    }
+
     res.json(updated);
   } catch (error) {
     console.error(error);
