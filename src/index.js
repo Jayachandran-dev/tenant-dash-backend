@@ -9,6 +9,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const tenantRoutes = require("./routes/tenants");
 const userRoutes = require("./routes/users");
 const businessRoutes = require("./routes/business");
+const itemRoutes = require("./routes/items");
 const app = express();
 const server = http.createServer(app);
 
@@ -33,6 +34,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use("/api/tenants", tenantRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/business", businessRoutes);
+app.use("/api/items", itemRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
