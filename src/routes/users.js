@@ -155,4 +155,61 @@ router.patch("/me", authMiddleware, async (req, res) => {
   }
 });
 
+// Remove member from current tenant (owner only)
+router.delete("/:membershipId", authMiddleware, async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const tenantId = parseInt(req.headers["x-tenant-id"]);
+    const membershipId = parseInt(req.params.membershipId);
+
+    if (!tenantId) {
+      return res.status(400).json({ message: "Tenant ID is required" });
+    }
+
+    const currentMembership = await prisma.membership.findUnique({
+      where: { userId_tenantId: { userId, tenantId } },
+    });
+
+    if (!currentMembership || currentMembership.role !== "owner") {
+      return res.status(403).json({ message: "Only owner can remove users" });
+    }
+
+    const target = await prisma.membership.findFirst({
+      where: { id: membershipId, tenantId },
+      include: {
+        user: { select: { id: true, name: true, mobile: true } },
+      },
+    });
+
+    if (!target) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    // Cannot remove yourself
+    if (target.userId === userId) {
+      return res.status(400).json({ message: "You cannot remove yourself" });
+    }
+
+    // Prevent removing the last owner
+    if (target.role === "owner") {
+      const ownerCount = await prisma.membership.count({
+        where: { tenantId, role: "owner" },
+      });
+      if (ownerCount <= 1) {
+        return res
+          .status(400)
+          .json({ message: "Cannot remove the last owner of this business" });
+      }
+    }
+
+    await prisma.membership.delete({
+      where: { id: membershipId },
+    });
+
+    res.json({ message: "Member removed successfully" });
+  } catch (error) {
+    console.error("Remove member error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 module.exports = router;
