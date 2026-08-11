@@ -23,6 +23,7 @@ model Tenant {
   createdAt    DateTime     @default(now())
   memberships  Membership[]
   items        Item[]
+  invites Invite[]
 }
 model User {
   id           Int          @id @default(autoincrement())
@@ -52,4 +53,17 @@ model Item {
   tenantId  Int
   tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+}
+
+model Invite {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
+  tenantId  Int
+  role      String    @default("employee")
+  createdBy Int
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }

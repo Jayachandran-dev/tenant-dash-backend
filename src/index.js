@@ -10,6 +10,7 @@ const tenantRoutes = require("./routes/tenants");
 const userRoutes = require("./routes/users");
 const businessRoutes = require("./routes/business");
 const itemRoutes = require("./routes/items");
+const inviteRoutes = require("./routes/invites");
 const app = express();
 const server = http.createServer(app);
 
@@ -35,6 +36,7 @@ app.use("/api/tenants", tenantRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api/items", itemRoutes);
+app.use("/api/invites", inviteRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
