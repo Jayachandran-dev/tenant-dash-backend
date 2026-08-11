@@ -1,0 +1,29 @@
+services:
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://tenant:tenant@db:5432/tenant_dash?schema=public
+      JWT_SECRET: local-dev-secret-change-me
+      PORT: 5000
+      NODE_ENV: development
+    depends_on:
+      - db
+    volumes:
+      - ./src:/app/src
+    command: sh -c "npx prisma db push && node src/index.js"
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tenant
+      POSTGRES_PASSWORD: tenant
+      POSTGRES_DB: tenant_dash
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
