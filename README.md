@@ -85,3 +85,20 @@ src/
   utils/
 prisma/
   schema.prisma
+
+
+## Docker
+
+The API can run inside a Docker container. Useful for consistent local runs and production-style deployments.
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- On Windows: WSL 2 updated (`wsl --update`)
+
+### Build the image
+
+From the `backend` folder:
+
+```bash
+docker build -t tenant-dash-api .
